@@ -12,7 +12,7 @@ def main():
     now = datetime.datetime.now().timetuple()
     feed_file = f'./links_{now.tm_hour}-{now.tm_min}-{now.tm_sec}.txt'
     start_url = "https://torob.com/browse/99/%D9%84%D9%BE-%D8%AA%D8%A7%D9%BE-%D9%88-%D9%86%D9%88%D8%AA-%D8%A8%D9%88" \
-                "%DA%A9-laptop/?stock_status=new "
+                "%DA%A9-laptop/?stock_status=new"
     count = 24
 
     opts, _ = getopt(sys.argv[1:], 'o:l:c:', ["output=", "start_url=", "count="])
@@ -39,13 +39,15 @@ def extract(feed_file, start_url, count):
 
     # Start the driver.
     driver = webdriver.Chrome(options=options)
-    wait = WebDriverWait(driver, .5)
+    wait = WebDriverWait(driver, 1)
 
     driver.get(start_url)
 
     cards_per_page = 24
     count -= 1
     count = max(count, 1)
+    max_retries = 20
+    current_retires = 0
     i = 1
     while i <= count // cards_per_page + 1:
         expected_card_count = i * cards_per_page
@@ -54,9 +56,14 @@ def extract(feed_file, start_url, count):
         try:
             wait.until(ec.presence_of_element_located(
                 (By.CSS_SELECTOR, f'.cards > .jsx-fa8eb4b3b47a1d18:nth-child({expected_card_count})')))
+            current_retires = 0
         except TimeoutException:
             print('timeout exception')
             i -= 1
+            current_retires += 1
+            if current_retires == max_retries:
+                print('maximum retries reached')
+                break
 
         print('scrolling down')
         driver.execute_script('window.scrollBy(0, 1000)')
