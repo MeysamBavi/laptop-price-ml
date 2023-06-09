@@ -1,18 +1,31 @@
 import scrapy
-from scrapy import Selector
 
 
 class LaptopsSpider(scrapy.Spider):
     name = "laptops"
 
     def start_requests(self):
-        yield scrapy.Request(
-            url="https://torob.com/p/c9e081d5-cc85-4cd5-98d3-116aa2b9aba2/%D9%84%D9%BE-%D8%AA%D8%A7%D9%BE-%D9%84%D9"
-                "%86%D9%88%D9%88-ideapad-3-4gb-ram-1tb-hdd-n4020-hd/",
-        )
+        links_file = open('./links.txt')
+        urls = links_file.readlines()
+        for url in urls:
+            yield scrapy.Request(
+                url=url,
+            )
 
     def parse(self, response):
-        yield {
+
+        result = {
             'title': response.css('.name h1::text').get(),
-            'price': response.css('.price_text div::text').get()
         }
+
+        price = response.css('.price_text div::text').get()
+        if not price or 'دیگر' in price:
+            price = response.css('.jsx-63b317fab2efbae.buy_box_text:nth-child(2)::text').get()
+        result['price'] = price
+
+        for detail in response.css('div.jsx-5b5c456cc255c2dc.header ~ div.jsx-5b5c456cc255c2dc'):
+            feature = detail.css('.detail-title::text').get()
+            value = detail.css('.detail-value::text').get()
+            result[feature] = value
+
+        yield result
