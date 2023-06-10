@@ -38,9 +38,11 @@ def extract(feed_file, start_url, count):
     options.add_argument('--disable-blink-features=AutomationControlled')
 
     # Start the driver.
+    print('starting the driver')
     driver = webdriver.Chrome(options=options)
     wait = WebDriverWait(driver, 1)
 
+    print('loading the page')
     driver.get(start_url)
 
     cards_per_page = 24
