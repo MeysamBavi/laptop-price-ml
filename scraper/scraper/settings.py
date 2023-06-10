@@ -1,3 +1,5 @@
+import logging
+
 # Scrapy settings for scraper project
 #
 # For simplicity, this file contains only settings considered important or
@@ -19,7 +21,17 @@ NEWSPIDER_MODULE = "scraper.spiders"
 ROBOTSTXT_OBEY = True
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-#CONCURRENT_REQUESTS = 32
+# Reduce concurrent requests to match bandwidth
+CONCURRENT_REQUESTS = 6
+
+# Set log level
+LOG_LEVEL = logging.INFO
+
+FEEDS = {
+    'data.jsonl': {
+        'format': 'jsonl'
+    }
+}
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay

@@ -1,15 +1,22 @@
 import scrapy
+import logging
 
 
 class LaptopsSpider(scrapy.Spider):
     name = "laptops"
 
+    def __init__(self, links_file='./links.txt', **kwargs):
+        super().__init__(**kwargs)
+        self.links_file = links_file
+
     def start_requests(self):
-        links_file = open('./links.txt')
-        urls = links_file.readlines()
-        for url in urls:
+        links = open(self.links_file)
+        urls = links.readlines()
+        for i in range(len(urls)):
+            if i > 0 and i % 50 == 0:
+                self.log(f'crawled {i} pages', level=logging.INFO)
             yield scrapy.Request(
-                url=url,
+                url=urls[i],
             )
 
     def parse(self, response):
