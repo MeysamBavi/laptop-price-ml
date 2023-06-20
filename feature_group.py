@@ -39,12 +39,12 @@ groups = [
     ['color', 'رنگ'],
 ]
 
-
 features = sorted(features)
 features = sorted(features, key=points_of, reverse=True)
 
 with open('./datasets/features.csv', 'w', newline='', encoding='utf-8') as csv_file:
-    writer = csv.DictWriter(csv_file, fieldnames=['feature-name', 'example-1', 'example-2', 'example-3'])
+    writer = csv.DictWriter(csv_file, fieldnames=[
+        'feature-name', 'not-null-count', 'example-1', 'example-2', 'example-3'])
     writer.writeheader()
     for f in features:
         values = df[f].dropna()
@@ -56,6 +56,7 @@ with open('./datasets/features.csv', 'w', newline='', encoding='utf-8') as csv_f
         e3 = examples[2] if len(examples) > 2 else ''
         writer.writerow({
             'feature-name': f,
+            'not-null-count': len(values),
             'example-1': e1,
             'example-2': e2,
             'example-3': e3
