@@ -1,4 +1,3 @@
-import locale
 import sys
 import json
 import csv

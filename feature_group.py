@@ -15,6 +15,7 @@ df = pd.read_csv('./datasets/data.csv', low_memory=False)
 features = list(df.columns)
 
 groups = [
+    ['clean-', 'title', 'price'],
     ['ram', 'رم', 'حافظه', 'memory'],
     ['processor', 'cpu', 'پردازنده', 'هسته', 'core', 'پردازش', 'thread', 'رشته', 'ترد'],
     ['disk', 'hard', 'hdd', 'هارد', 'حافظه', 'storage'],

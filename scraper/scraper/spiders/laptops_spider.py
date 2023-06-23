@@ -1,5 +1,7 @@
 import scrapy
 import logging
+from urllib.parse import urlparse
+import requests
 
 
 class LaptopsSpider(scrapy.Spider):
@@ -20,17 +22,21 @@ class LaptopsSpider(scrapy.Spider):
             )
 
     def parse(self, response):
+        purl = urlparse(response.url)
+        laptop_id = purl.path.split('/')[2]
 
-        result = {
-            'title': response.css('.name h1::text').get(),
-        }
+        json_data = requests.get(f'https://api.torob.com/v4/base-product/details-log-click/?prk={laptop_id}').json()
 
-        price = response.css('.price_text div::text').get()
-        if not price or 'دیگر' in price:
-            price = response.css('.jsx-63b317fab2efbae.buy_box_text:nth-child(2)::text').get()
+        result = {'clean-' + k: v for k, v in json_data['attributes'].items()}
+        result['id'] = laptop_id
+        result['title'] = response.css('.name h1::text').get()
+
+        price = json_data.get('price_text')
+        if not price:
+            price = json_data.get('price')
         result['price'] = price
 
-        for detail in response.css('div.jsx-5b5c456cc255c2dc.header ~ div.jsx-5b5c456cc255c2dc'):
+        for detail in response.css('div.header ~ div'):
             feature = detail.css('.detail-title::text').get()
             value = detail.css('.detail-value::text').get()
             result[feature] = value
